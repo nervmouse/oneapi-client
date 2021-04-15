@@ -54,7 +54,7 @@ function API({base_url='',pa=[],joinner='.',hook={},api_cache={},store={},root,o
     
     let api=new Proxy(object,{
       get:function(target,prop,self){
-          console.log(target,this)
+          //console.log(target,this)
           if (target.children[prop]){
             return target.children[prop]
           }else{
