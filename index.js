@@ -1,4 +1,4 @@
-import axios from 'axios'
+const axios =require('axios')
 function saveToken(token,root){
   localStorage.setItem('oneapi-jwt',token)
   root._header['x-wfauth']=token
@@ -92,4 +92,4 @@ function API({base_url='',pa=[],joinner='.',hook={},api_cache={},store={},root,o
   }
   
 }
-export {API,hookAuth}
+module.exports= {API,hookAuth}
