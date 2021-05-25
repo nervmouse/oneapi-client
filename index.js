@@ -1,11 +1,17 @@
 const axios =require('axios')
+const {mergeDeep} =require('./lib/deep_merge.js')
+
 function saveToken(token,root){
-  localStorage.setItem('oneapi-jwt',token)
+  if (localStorage){
+    localStorage.setItem('oneapi-jwt',token)
+  }
   root._header['x-wfauth']=token
 }
 function clearToken(root){
   //localStorage.setItem('oneapi-jwt',token)
-  localStorage.removeItem('oneapi-jwt')
+  if (localStorage){
+    localStorage.removeItem('oneapi-jwt')
+  }
   delete root._header['x-wfauth']
 }
 let hookAuth={
@@ -23,7 +29,10 @@ let hookAuth={
   'auth.check':{
     onBefore(params={},store,self,root){
       if(!params.token){
-        params.token=localStorage.getItem('oneapi-jwt')
+        if (localStorage){
+          params.token=localStorage.getItem('oneapi-jwt')
+        }
+        
       }
       
     },
@@ -37,7 +46,7 @@ let hookAuth={
   }
   
 }
-function API({base_url='',pa=[],joinner='.',hook={},api_cache={},store={},root,object=function(){},isRoot=true}){
+function API({base_url='',pa=[],joinner='.',hook={},api_cache={},store={},root={},object=function(){},isRoot=true}){
   let api_path=pa.join(joinner)
   if (api_cache[api_path]){
     return api_cache[api_path]
@@ -68,21 +77,30 @@ function API({base_url='',pa=[],joinner='.',hook={},api_cache={},store={},root,o
       apply:async function(target, self, args){
         let url=base_url+api_path
         let hk=hook[api_path]
+        
         let params=args[0] || {}
-        let res
+        let tmp_cfg=args[1]
+        let cfg=mergeDeep({},root)
+        if (tmp_cfg){
+          
+          cfg=mergeDeep(cfg,tmp_cfg)
+          
+        }
+        
         if (hk && hk.onBefore){
-          res=await hk.onBefore(params,store,self,root)
+          res=await hk.onBefore(params,store,self,cfg)
           if (res) return res
         }
         //res= (await axios.post(url,params)).data
+        
         res= (await axios({
           method:'post',
           url,
-          headers:root._header,
+          headers:cfg._header,
           data:params
         })).data
         if (hk && hk.onAfter){
-          res=await hk.onAfter(res,params,store,self,root)
+          res=await hk.onAfter(res,params,store,self,cfg)
         }
         return res
       }
