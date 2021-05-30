@@ -1,16 +1,22 @@
 const axios =require('axios')
 const {mergeDeep} =require('./lib/deep_merge.js')
-
+let storageInstance=localStorage
+function setStorage(storage=localStorage){
+  storageInstance=storage
+}
 function saveToken(token,root){
-  if (localStorage){
-    localStorage.setItem('oneapi-jwt',token)
+  if (storageInstance){
+    storageInstance.setItem('oneapi-jwt',token)
+  }
+  if (!root._header){
+    root._header={}
   }
   root._header['x-wfauth']=token
 }
 function clearToken(root){
   //localStorage.setItem('oneapi-jwt',token)
-  if (localStorage){
-    localStorage.removeItem('oneapi-jwt')
+  if (storageInstance){
+    storageInstance.removeItem('oneapi-jwt')
   }
   delete root._header['x-wfauth']
 }
@@ -30,7 +36,7 @@ let hookAuth={
     onBefore(params={},store,self,root){
       if(!params.token){
         if (localStorage){
-          params.token=localStorage.getItem('oneapi-jwt')
+          params.token=storageInstance.getItem('oneapi-jwt')
         }
         
       }
@@ -110,4 +116,4 @@ function API({base_url='',pa=[],joinner='.',hook={},api_cache={},store={},root={
   }
   
 }
-module.exports= {API,hookAuth}
+module.exports= {API,hookAuth,setStorage}
