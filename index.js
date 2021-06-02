@@ -20,9 +20,37 @@ function clearToken(root){
   }
   delete root._header['x-wfauth']
 }
+function getURIToken(name='login_token'){
+  try{
+    let qs = new URLSearchParams(window.location.search)
+    return qs.get(name)
+  }catch(e){
+
+  }
+  
+}
 let hookAuth={
   'auth.login':{
-    
+    onBefore(params={},store,self,root,sessionStore){
+      if(!params.id){
+        
+        let login_token = getURIToken('login_token')
+        
+        if (login_token){
+          params.login_token=login_token
+          params.sys_token=login_token
+        }else{
+          let auth_token=storageInstance.getItem('oneapi-jwt')
+          if(auth_token){
+            params.auth_token=auth_token
+            
+            sessionStore.auth_token=auth_token //store token 
+          }
+        }
+        
+      }
+      
+    },
     onAfter(auth,params,store,self,root){
       if (auth.auth){
         saveToken(auth.jwt_token,root)
@@ -35,9 +63,15 @@ let hookAuth={
   'auth.check':{
     onBefore(params={},store,self,root){
       if(!params.token){
-        if (localStorage){
-          params.token=storageInstance.getItem('oneapi-jwt')
+        let auth_token =getURIToken('auth_token')
+        if (auth_token){
+          params.token=auth_token
+        }else{
+          if (storageInstance){
+            params.token=storageInstance.getItem('oneapi-jwt')
+          }
         }
+        
         
       }
       
