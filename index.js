@@ -43,8 +43,10 @@ let hookAuth={
           let auth_token=storageInstance.getItem('oneapi-jwt')
           if(auth_token){
             params.auth_token=auth_token
+            if (sessionStore){
+              sessionStore.auth_token=auth_token //store token 
+            }
             
-            sessionStore.auth_token=auth_token //store token 
           }
         }
         
