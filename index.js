@@ -55,7 +55,10 @@ let hookAuth={
     },
     onAfter(auth,params,store,self,root){
       if (auth.auth){
-        saveToken(auth.jwt_token,root)
+        if (auth.jwt_token){
+          saveToken(auth.jwt_token,root)
+        }
+        
       }else{
         clearToken(root)
       }
