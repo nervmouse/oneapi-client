@@ -1,7 +1,24 @@
 const axios =require('axios')
 const {mergeDeep} =require('./lib/deep_merge.js')
-let storageInstance=localStorage
-function setStorage(storage=localStorage){
+let memStorage={
+  data:{},
+  setItem(item,val){
+    thiis.data[item]=val
+  },
+  removeItem(item){
+    thiis.data[item] = undefined
+  },
+  getItem(item) {
+    return thiis.data[item]
+  }
+}
+let storageInstance=null
+try{
+  storageInstance=localStorage
+}catch(e){
+  storageInstance = memStorage
+}
+function setStorage(storage){
   storageInstance=storage
 }
 function saveToken(token,root){
@@ -155,4 +172,4 @@ function API({base_url='',pa=[],joinner='.',hook={},api_cache={},store={},root={
   }
   
 }
-module.exports= {API,hookAuth,setStorage}
+module.exports = { API, hookAuth, setStorage, memStorage}
