@@ -1,0 +1,23 @@
+
+
+export interface APIClinetInstance {
+  (): Object | Array<Object> ,
+  [key:string]:APIClinetInstance
+}
+export type APIConfig {
+  base_url:string,
+  pa:string[],
+  joinner:string='.',
+  hook:Object={},
+  api_cache:Object={},
+  store:Object={},
+  root:Object={},
+  object:()=>void,
+  isRoot:boolean=true
+}
+export interface API {
+  (config:APIConfig):APIClinetInstance
+}
+export default interface APIModule{
+  API
+}

@@ -93,8 +93,6 @@ let hookAuth={
             params.token=storageInstance.getItem('oneapi-jwt')
           }
         }
-        
-        
       }
       
     },
@@ -148,7 +146,7 @@ function API({base_url='',pa=[],joinner='.',hook={},api_cache={},store={},root={
           cfg=mergeDeep(cfg,tmp_cfg)
           
         }
-        
+        let res
         if (hk && hk.onBefore){
           res=await hk.onBefore(params,store,self,cfg)
           if (res) return res
