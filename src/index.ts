@@ -7,9 +7,19 @@ export interface IPlainConfig extends IPlainObject{
 }
 export interface IHeader extends IPlainObject {
 }
-export interface IAPISourceObject{
-  (): IPlainObject | Array<IPlainObject> 
-  [key:string]:IAPISourceObject | IHeader
+export interface IAPIFunction{
+  (params?:any):any
+}
+export interface IAPISourceObject extends IAPIFunction   {
+  children:{
+    _header:IHeader
+    [key:string]:IAPI | IHeader
+  }
+  [key:string]:IAPISourceObject | IHeader 
+  
+}
+export interface IAPI extends IAPIFunction{
+  [key:string]:IAPI
 }
 export interface IHook{
   
@@ -24,7 +34,7 @@ export interface IAPIConfig {
   pa?:Array<string>
   joinner?:string
   hook?:IHookSet
-  api_cache?:IPlainObject
+  api_cache?:{[key:string]:IAPI}
   store?:IPlainObject
   root?:Object
   object?:IAPISourceObject
@@ -37,7 +47,7 @@ export class APIConfig implements IAPIConfig{
   pa:string[]=[]
   joinner='.'
   hook:IHookSet={}
-  api_cache={}
+  api_cache:{[key:string]:IAPI}={}
   store={}
   root={} as IAPISourceObject
   object=(()=>{}) as IAPISourceObject
@@ -172,19 +182,18 @@ export const hookAuth:IHookSet={
 interface ProxyHandler{
   enumerate(target:IAPISourceObject):any[]
 }
-const api_cache:{[key :string]:IAPISourceObject}={}
+//const api_cache:{[key :string]:IAPISourceObject}={}
 
 
-export const API=function(config:APIConfig):IAPISourceObject{
-  const {object,pa ,joinner,isRoot,base_url,hook,root,store} = config
+export const API=function(config:APIConfig):IAPI{
+  const {object,pa ,joinner,isRoot,base_url,hook,root,store,api_cache} = config
   let api_path:string=pa.join(joinner)
   if (api_cache[api_path]){
     return api_cache[api_path]
   }else{
     if (!object.children){
-      object.children={} as IAPISourceObject
-      if(isRoot){
-        object.children._header={} as IHeader
+        object.children={_header:{}} 
+        //object.children._header={} as IHeader
       }
     }
     const api=new Proxy(config.object,{
@@ -254,9 +263,9 @@ export const API=function(config:APIConfig):IAPISourceObject{
           }
           return res
         }
-    } )
+    } ) as IAPI
     api_cache[api_path]=api
     return api
   }
   
-}
+
