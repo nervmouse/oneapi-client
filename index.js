@@ -3,13 +3,13 @@ const {mergeDeep} =require('./lib/deep_merge.js')
 let memStorage={
   data:{},
   setItem(item,val){
-    thiis.data[item]=val
+    this.data[item]=val
   },
   removeItem(item){
-    thiis.data[item] = undefined
+    this.data[item] = undefined
   },
   getItem(item) {
-    return thiis.data[item]
+    return this.data[item]
   }
 }
 let storageInstance=null
