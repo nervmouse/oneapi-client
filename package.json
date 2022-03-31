@@ -5,14 +5,15 @@
   "main": "index.js",
   "types": "index.d.js",
   "scripts": {
-    "build":"tsc",
+    "build": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "axios": "^0.21.0"
+    "axios": "^0.21.0",
+    "@types/lodash": "^4.14.181",
+    "lodash": "^4.17.21"
   },
   "devDependencies": {
     "typescript": "^4.6.3"

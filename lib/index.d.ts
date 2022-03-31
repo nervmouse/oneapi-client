@@ -1,12 +1,12 @@
 export interface IPlainObject {
-    [key: string]: IPlainObject | string | number | boolean;
+    [key: string]: IPlainObject | string | number | boolean | IPlainObject[];
 }
 export interface IPlainConfig extends IPlainObject {
 }
 export interface IHeader extends IPlainObject {
 }
 export interface IAPISourceObject {
-    (): Object | Array<Object>;
+    (): IPlainObject | Array<IPlainObject>;
     [key: string]: IAPISourceObject | IHeader;
 }
 export interface IHook {
