@@ -11,11 +11,11 @@ export interface IAPIFunction{
   (params?:any):any
 }
 export interface IAPISourceObject extends IAPIFunction   {
-  children:{
+  children?:{
     _header:IHeader
     [key:string]:IAPI | IHeader
   }
-  [key:string]:IAPISourceObject | IHeader 
+  [key:string]:IAPISourceObject | IHeader  | undefined
   
 }
 export interface IAPI extends IAPIFunction{
@@ -43,15 +43,15 @@ export interface IAPIConfig {
 }
 
 export class APIConfig implements IAPIConfig{
-  base_url='/api/'
+  base_url?='/api/'
   pa:string[]=[]
   joinner='.'
   hook:IHookSet={}
-  api_cache:{[key:string]:IAPI}={}
-  store={}
-  root={} as IAPISourceObject
-  object=(()=>{}) as IAPISourceObject
-  isRoot=true
+  api_cache?:{[key:string]:IAPI}={}
+  store?={}
+  root?={} as IAPISourceObject
+  object?=(()=>{}) as IAPISourceObject
+  isRoot?=true
   _header:IHeader={} 
 }
 
@@ -184,40 +184,74 @@ interface ProxyHandler{
 }
 //const api_cache:{[key :string]:IAPISourceObject}={}
 
+/**
+ * export const API=function(config:APIConfig={
+  base_url:'/api/',
+  pa:[],
+  joinner:'.',
+  hook:{},
+  _header:{},
+  object:(()=>{}) as IAPI,
+  api_cache:{},
+  store:{},
+  isRoot:true
 
-export const API=function(config:APIConfig):IAPI{
-  const {object,pa ,joinner,isRoot,base_url,hook,root,store,api_cache} = config
+
+
+}):IAPI{
+ * 
+ */
+export const API=function({
+  base_url='/api/',
+  pa=[] as string[],
+  joinner='.',
+  hook={} as IHookSet,
+  _header={},
+  object=(()=>{}) as IAPISourceObject,
+  api_cache={} as {[key:string]:IAPI},
+  store={},
+  isRoot=true,
+  root={} as IAPISourceObject
+}):IAPI{
+  //const {object,pa ,joinner,isRoot,base_url,hook,root,store,api_cache} = config
   let api_path:string=pa.join(joinner)
-  if (api_cache[api_path]){
+  if (api_cache && api_cache[api_path]){
     return api_cache[api_path]
   }else{
-    if (!object.children){
+    if (object &&!object.children){
         object.children={_header:{}} 
         //object.children._header={} as IHeader
       }
     }
-    const api=new Proxy(config.object,{
-        get:function(target,prop:string,self){
+    const api=new Proxy((object),{
+        get:function(target={} as IAPISourceObject,prop:string,self){
             //console.log(target,this)
-            if (target.children[prop] ){
-              return target.children[prop]
-            }else{
-              const newTarget =( ()=>{} )as IAPISourceObject
-              const newPa:string[]=[...pa]
-              if (prop){
-                newPa.push(prop )
+            if (target && target.children){
+              if ( target.children[prop] ){
+                return target.children[prop]
+              }else{
+                const newTarget =( ()=>{} )as IAPISourceObject
+                const newPa:string[]=[...pa]
+                if (prop){
+                  newPa.push(prop )
+                }
+                
+                  return target.children[prop]=API({
+                    base_url,
+                    pa:newPa,
+                    object:newTarget,
+                    joinner,
+                    hook,
+                    api_cache,
+                    store,
+                    root:(root || self),
+                    isRoot:false} as APIConfig
+                  )
+                
+                
               }
-              return target.children[prop]=API({
-                base_url,pa:newPa,
-                object:newTarget,
-                joinner,
-                hook,
-                api_cache,
-                store,
-                root:(root || self),
-                isRoot:false} as APIConfig
-              )
             }
+
             
         },/*
         enumerate:function(target:IAPISourceObject){
@@ -247,7 +281,7 @@ export const API=function(config:APIConfig):IAPI{
           }
           let res
           if (hk && hk.onBefore){
-            res=await hk.onBefore(params,store,self,cfg)
+            res=await hk.onBefore(params,store || {},self,cfg)
             if (res) return res
           }
           //res= (await axios.post(url,params)).data
@@ -259,12 +293,15 @@ export const API=function(config:APIConfig):IAPI{
             data:params
           })).data
           if (hk && hk.onAfter){
-            res=await hk.onAfter(res,params,store,self,cfg)
+            res=await hk.onAfter(res,params,store || {},self,cfg)
           }
           return res
         }
     } ) as IAPI
-    api_cache[api_path]=api
+    if (api_cache){
+      api_cache[api_path]=api
+    }
+    
     return api
   }
   
