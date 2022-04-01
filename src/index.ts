@@ -24,7 +24,7 @@ export interface IAPI extends IAPIFunction{
 export interface IHook{
   
   onBefore?:(params:IPlainConfig,store:Object,self:IPlainObject,cfg:APIConfig,storage?:IPlainObject)=>any
-  onAfter?:(res:IPlainObject,params:IPlainConfig,store:IPlainObject,self:Object,root:APIConfig)=>any
+  onAfter?:(res:IPlainObject,params:IPlainConfig,store:IPlainObject,self:Object,root:IAPISourceObject)=>any
 }
 export interface IHookSet{
   [key:string]:IHook
@@ -94,7 +94,7 @@ try{
 export function setStorage(storage:IStorage){
   storageInstance=storage
 }
-export function saveToken(token:string,root:APIConfig){
+export function saveToken(token:string,root:IAPISourceObject){
   if (storageInstance){
     storageInstance.setItem('oneapi-jwt',token)
   }
@@ -103,12 +103,15 @@ export function saveToken(token:string,root:APIConfig){
   }
   root._header['x-wfauth']=token
 }
-export function clearToken(root:APIConfig){
+export function clearToken(root:IAPISourceObject){
   //localStorage.setItem('oneapi-jwt',token)
   if (storageInstance){
     storageInstance.removeItem('oneapi-jwt')
   }
-  delete root._header['x-wfauth']
+  if (root._header){
+    delete root._header['x-wfauth']
+  }
+  
 }
 export function getURIToken(name='login_token'){
   try{
@@ -293,7 +296,7 @@ export const API=function({
             data:params
           })).data
           if (hk && hk.onAfter){
-            res=await hk.onAfter(res,params,store || {},self,cfg)
+            res=await hk.onAfter(res,params,store || {},self,root)
           }
           return res
         }
