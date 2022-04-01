@@ -20,7 +20,7 @@ export interface IAPI extends IAPIFunction {
 }
 export interface IHook {
     onBefore?: (params: IPlainConfig, store: Object, self: IPlainObject, cfg: APIConfig, storage?: IPlainObject) => any;
-    onAfter?: (res: IPlainObject, params: IPlainConfig, store: IPlainObject, self: Object, root: APIConfig) => any;
+    onAfter?: (res: IPlainObject, params: IPlainConfig, store: IPlainObject, self: Object, root: IAPISourceObject) => any;
 }
 export interface IHookSet {
     [key: string]: IHook;
@@ -62,8 +62,8 @@ export interface IStorage {
     removeItem(key: string): void;
 }
 export declare function setStorage(storage: IStorage): void;
-export declare function saveToken(token: string, root: APIConfig): void;
-export declare function clearToken(root: APIConfig): void;
+export declare function saveToken(token: string, root: IAPISourceObject): void;
+export declare function clearToken(root: IAPISourceObject): void;
 export declare function getURIToken(name?: string): string | null | undefined;
 export declare const hookAuth: IHookSet;
 /**
