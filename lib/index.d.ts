@@ -1,10 +1,8 @@
 export interface IPlainObject {
     [key: string]: IPlainObject | string | number | boolean | IPlainObject[];
 }
-export interface IPlainConfig extends IPlainObject {
-}
-export interface IHeader extends IPlainObject {
-}
+export declare type IPlainConfig = IPlainObject;
+export declare type IHeader = IPlainObject;
 export interface IAPIFunction {
     (params?: any): any;
 }
@@ -18,9 +16,11 @@ export interface IAPISourceObject extends IAPIFunction {
 export interface IAPI extends IAPIFunction {
     [key: string]: IAPI;
 }
+export declare type IHookFunctionAfter = (res: IPlainObject, params: IPlainConfig, store: IPlainObject, self: Record<string, any>, root: IAPISourceObject, storage?: IPlainObject) => any;
+export declare type IHookFunctionBefore = (params: IPlainConfig, store: Record<string, any>, self: IPlainObject, cfg: APIConfig, storage?: IPlainObject) => any;
 export interface IHook {
-    onBefore?: (params: IPlainConfig, store: Object, self: IPlainObject, cfg: APIConfig, storage?: IPlainObject) => any;
-    onAfter?: (res: IPlainObject, params: IPlainConfig, store: IPlainObject, self: Object, root: IAPISourceObject) => any;
+    onBefore?: IHookFunctionBefore;
+    onAfter?: IHookFunctionAfter;
 }
 export interface IHookSet {
     [key: string]: IHook;
@@ -34,7 +34,7 @@ export interface IAPIConfig {
         [key: string]: IAPI;
     };
     store?: IPlainObject;
-    root?: Object;
+    root?: Record<string, any>;
     object?: IAPISourceObject;
     isRoot?: boolean;
     _header?: IHeader;
