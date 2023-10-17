@@ -1,6 +1,6 @@
 {
-  "name": "oneapi-client",
-  "version": "2.2.0",
+  "name": "@nervmouse/oneapi-client",
+  "version": "2.2.1",
   "description": "",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",

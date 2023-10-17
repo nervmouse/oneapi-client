@@ -250,6 +250,11 @@ export const API=function({
                 // eslint-disable-next-line @typescript-eslint/no-empty-function
                 const newTarget =( ()=>{} )as IAPISourceObject
                 const newPa:string[]=[...pa]
+                if (prop==='_url'){
+                  return ()=>{
+                    return base_url+api_path
+                  }
+                }
                 if (prop){
                   newPa.push(prop )
                 }
